@@ -4,8 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
+    android:padding="25dp"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/textVieHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:textColor="#141414"
+        android:text="BouncingScrollBehaviour"
+        android:textSize="25dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="85dp"
+        android:text="RecyclerView"
+        android:textAllCaps="false"
+        android:layout_below="@+id/textVieHeader"
+        app:backgroundTint="@color/colorAccent"
+        android:textColor="#FFFFFF"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonRecycler"
+        android:text="NestedScrollView"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/colorPrimaryDark"
+        android:textColor="#FFFFFF"/>
 
 </RelativeLayout>
