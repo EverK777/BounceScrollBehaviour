@@ -35,7 +35,7 @@
         android:layout_centerHorizontal="true"
         android:textColor="#141414"
         android:layout_below="@id/horizontalRecycler"
-        android:text="Horizonal"
+        android:text="Vertical"
         />
 
     <com.ever777.bouncingscroll.BouncingRecyclerView
