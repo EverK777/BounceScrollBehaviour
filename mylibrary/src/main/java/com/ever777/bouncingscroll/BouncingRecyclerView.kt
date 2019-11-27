@@ -213,7 +213,6 @@ private fun View.translationXAnimation() {
     })
     objectAnimator.start()
 }
-
 private fun View.translationYAnimation() {
     val objectAnimator = ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, this.translationY, 0f)
     objectAnimator.duration = 180
