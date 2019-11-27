@@ -18,7 +18,7 @@ If you want to have scroll behaviour like IOS in your Android applications, this
                                                                
 
 ## Installation
-### Configure jitpack
+### Configure jitpack in gradle
  
 ```
 allprojects {
@@ -29,7 +29,7 @@ allprojects {
 }
 ```
 
-### Add library to gradle app and Sync
+### Add library to gradle app level and Sync
 
 ```
 dependencies {
