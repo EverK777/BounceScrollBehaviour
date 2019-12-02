@@ -30,6 +30,7 @@ class BouncingRecyclerView @JvmOverloads constructor(
     private var screenHeight: Int = 0
     private var currentXTranslation = 0f
     private var currentYTranslation = 0f
+    private var isFreeScroll = false
 
     init {
         val display = (getContext() as Activity).windowManager.defaultDisplay
@@ -53,21 +54,20 @@ class BouncingRecyclerView @JvmOverloads constructor(
             rawY = event.rawY + location[1]
             rawX = event.rawX + location[0]
 
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (!isOverScrolling) {
                 oldYMove = rawY
                 oldXMove = rawX
             }
 
             if (event.action == MotionEvent.ACTION_MOVE) {
-                // horizontal scroll right to left
-                if (this.canScrollHorizontally(1) || this.canScrollHorizontally(-1)) {
+                if (!this.layoutManager!!.canScrollVertically()) {
                     if (!this.canScrollHorizontally(1)) {
+                        isOverScrolling = true
                         isOverScrollingVertical = false
                         for (i in 0 until this.childCount) {
                             val view: View = this.getChildAt(i)
                             val delta = oldXMove - rawX
                             if (delta > 0) {
-                                isOverScrolling = true
                                 if (oldXMove != rawX) {
                                     view.translationX = (delta * 0.50f) * -1
                                     currentXTranslation = view.translationX
@@ -79,11 +79,12 @@ class BouncingRecyclerView @JvmOverloads constructor(
                     // horizontal scroll left to right
                     if (!this.canScrollHorizontally(-1)) {
                         isOverScrollingVertical = false
+                        isOverScrolling = true
                         for (i in 0 until this.childCount) {
                             val view: View = this.getChildAt(i)
                             val delta = oldXMove - rawX
+                            println("DELTAA $delta")
                             if (delta < 0) {
-                                isOverScrolling = true
                                 if (oldXMove != rawX) {
                                     view.translationX = (delta * 0.50f) * -1
                                     currentXTranslation = view.translationX
@@ -94,47 +95,37 @@ class BouncingRecyclerView @JvmOverloads constructor(
                     }
 
                 }
-
-                //verticalMovement down to up
-                if (this.canScrollVertically(1) || this.canScrollVertically(-1)) {
-                    if (!this.canScrollVertically(1)) {
+                else {
+                    isOverScrollingVertical = true
+                    val delta = oldYMove - rawY
+                    if (delta > 0 ){
+                        isOverScrolling = true
+                        isFreeScroll =false
                         for (i in 0 until this.childCount) {
                             val view: View = this.getChildAt(i)
-                            val delta = oldYMove - rawY
-                            if (delta > 0) {
-                                if (oldYMove != rawY) {
-                                    isOverScrolling = true
-                                    view.translationY  = (delta * 0.50f) * -1
-                                    currentYTranslation = view.translationY
-                                }
-                            }
+                            view.translationY = (delta * 0.50f) * -1
+                            currentYTranslation = view.translationY
                         }
                         return@setOnTouchListener false
-                    }
-
-                    //verticalMovement up to down
-                    if (!this.canScrollVertically(-1)) {
+                    }else {
+                        isOverScrolling = true
+                        isFreeScroll =false
                         for (i in 0 until this.childCount) {
                             val view: View = this.getChildAt(i)
-                            val delta = oldYMove - rawY
-                            if (delta < 0) {
-                                if (oldYMove != rawY) {
-                                    isOverScrolling = true
-                                    view.translationY  = (delta * 0.50f) * -1
-                                    currentYTranslation = view.translationY
-                                }
-                            }
+                            view.translationY = (delta * 0.50f) * -1
+                            currentYTranslation = view.translationY
                         }
                         return@setOnTouchListener false
-
                     }
                 }
-
-
                 oldYMove = rawY
                 oldXMove = rawX
             }
             if (event.action == MotionEvent.ACTION_UP) {
+
+                if(isFreeScroll){
+                    return@setOnTouchListener false
+                }
 
                 for (i in 0 until this.childCount) {
                     val view: View = this.getChildAt(i)
@@ -213,6 +204,7 @@ private fun View.translationXAnimation() {
     })
     objectAnimator.start()
 }
+
 private fun View.translationYAnimation() {
     val objectAnimator = ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, this.translationY, 0f)
     objectAnimator.duration = 180

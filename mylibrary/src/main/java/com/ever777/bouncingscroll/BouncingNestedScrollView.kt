@@ -49,7 +49,7 @@ class BouncingNestedScrollView @JvmOverloads constructor(
             rawY = event.rawY + location[1]
             rawX = event.rawX + location[0]
 
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (!isOverScrolling) {
                 oldYMove = rawY
                 oldXMove = rawX
             }

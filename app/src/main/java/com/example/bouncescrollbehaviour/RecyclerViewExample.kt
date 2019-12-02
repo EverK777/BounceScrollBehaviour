@@ -30,7 +30,7 @@ class RecyclerViewExample : AppCompatActivity() {
     }
 
     private fun setData() {
-        for (i in 1 until 85) {
+        for (i in 1 until 20) {
             var imageName: String = "$i"
             if (i  < 10) {
                 imageName = "00$i"
