@@ -69,6 +69,11 @@ dependencies {
     </com.ever777.bouncingscroll.BouncingNestedScrollView>
  ```
  
+ ### You can disable the final animation
+  ```
+  bounceScroll.activateBounceAnim = false
+   ```
+ 
 # License
  
   ```
