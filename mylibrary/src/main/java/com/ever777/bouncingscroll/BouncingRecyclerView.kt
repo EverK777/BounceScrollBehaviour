@@ -19,8 +19,7 @@ class BouncingRecyclerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : RecyclerView(context, attrs, defStyleAttr) {
-
+) : RecyclerView(context, attrs, defStyleAttr), BounceBehaiviour {
 
     private var isOverScrolling = false
     private var isOverScrollingVertical = true
@@ -31,6 +30,7 @@ class BouncingRecyclerView @JvmOverloads constructor(
     private var currentXTranslation = 0f
     private var currentYTranslation = 0f
     private var isFreeScroll = false
+    var activateBounceAnim = true
 
     init {
         val display = (getContext() as Activity).windowManager.defaultDisplay
@@ -83,7 +83,6 @@ class BouncingRecyclerView @JvmOverloads constructor(
                         for (i in 0 until this.childCount) {
                             val view: View = this.getChildAt(i)
                             val delta = oldXMove - rawX
-                            println("DELTAA $delta")
                             if (delta < 0) {
                                 if (oldXMove != rawX) {
                                     view.translationX = (delta * 0.50f) * -1
@@ -98,42 +97,43 @@ class BouncingRecyclerView @JvmOverloads constructor(
                 else {
                     isOverScrollingVertical = true
                     val delta = oldYMove - rawY
-                    if (delta > 0 ){
+                    if (!this.canScrollVertically(1)){
                         isOverScrolling = true
                         isFreeScroll =false
                         for (i in 0 until this.childCount) {
-                            val view: View = this.getChildAt(i)
-                            view.translationY = (delta * 0.50f) * -1
-                            currentYTranslation = view.translationY
+                            if(delta > 0 && oldXMove != rawY){
+                                val view: View = this.getChildAt(i)
+                                view.translationY = (delta * 0.50f) * -1
+                                currentYTranslation = view.translationY
+                            }
                         }
                         return@setOnTouchListener false
-                    }else {
+                    }else if(!this.canScrollVertically(-1)) {
                         isOverScrolling = true
                         isFreeScroll =false
                         for (i in 0 until this.childCount) {
-                            val view: View = this.getChildAt(i)
-                            view.translationY = (delta * 0.50f) * -1
-                            currentYTranslation = view.translationY
+                            if(delta < 0 && oldXMove != rawY) {
+                                val view: View = this.getChildAt(i)
+                                view.translationY = (delta * 0.50f) * -1
+                                currentYTranslation = view.translationY
+                            }
                         }
                         return@setOnTouchListener false
                     }
                 }
                 oldYMove = rawY
                 oldXMove = rawX
+                isFreeScroll = true
             }
             if (event.action == MotionEvent.ACTION_UP) {
-
-                if(isFreeScroll){
-                    return@setOnTouchListener false
-                }
 
                 for (i in 0 until this.childCount) {
                     val view: View = this.getChildAt(i)
 
                     if (isOverScrolling && isOverScrollingVertical) {
-                        view.translationYAnimation()
+                        view.translationYAnimation(isFreeScroll,activateBounceAnim)
                     } else if (isOverScrolling && !isOverScrollingVertical) {
-                        view.translationXAnimation()
+                        view.translationXAnimation(isFreeScroll,activateBounceAnim)
                     }
 
                 }
@@ -145,6 +145,8 @@ class BouncingRecyclerView @JvmOverloads constructor(
 
                 currentYTranslation = 0f
                 currentXTranslation = 0f
+
+                isFreeScroll = false
             }
             false
         }
@@ -155,68 +157,4 @@ class BouncingRecyclerView @JvmOverloads constructor(
         child.translationY = currentYTranslation
         child.translationX = currentXTranslation
     }
-
-
-}
-
-private fun View.bouncingAnimationY() {
-    val springAnimationY: SpringAnimation = this.let {
-        SpringAnimation(it, DynamicAnimation.TRANSLATION_Y, it.translationY)
-    }
-
-    springAnimationY.setMaxValue(200f)
-
-    val velocity = 750f
-    springAnimationY.setStartVelocity(velocity)
-    springAnimationY.spring?.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
-    springAnimationY.spring?.stiffness = SpringForce.STIFFNESS_MEDIUM
-
-    springAnimationY.start()
-}
-
-private fun View.bouncingAnimationX() {
-    val springAnimationX: SpringAnimation = this.let {
-        SpringAnimation(it, DynamicAnimation.TRANSLATION_X, it.translationX)
-    }
-
-    springAnimationX.setMaxValue(200f)
-
-    val velocity = 750f
-    springAnimationX.setStartVelocity(velocity)
-    springAnimationX.spring?.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
-    springAnimationX.spring?.stiffness = SpringForce.STIFFNESS_MEDIUM
-
-    springAnimationX.start()
-}
-
-private fun View.translationXAnimation() {
-    val objectAnimator = ObjectAnimator.ofFloat(this, View.TRANSLATION_X, this.translationX, 0f)
-    objectAnimator.duration = 180
-    objectAnimator.addListener(object : Animator.AnimatorListener {
-        override fun onAnimationRepeat(animation: Animator?) {}
-        override fun onAnimationEnd(animation: Animator?) {
-            this@translationXAnimation.bouncingAnimationX()
-        }
-
-        override fun onAnimationCancel(animation: Animator?) {}
-        override fun onAnimationStart(animation: Animator?) {}
-
-    })
-    objectAnimator.start()
-}
-
-private fun View.translationYAnimation() {
-    val objectAnimator = ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, this.translationY, 0f)
-    objectAnimator.duration = 180
-    objectAnimator.addListener(object : Animator.AnimatorListener {
-        override fun onAnimationRepeat(animation: Animator?) {}
-        override fun onAnimationEnd(animation: Animator?) {
-            this@translationYAnimation.bouncingAnimationY()
-        }
-
-        override fun onAnimationCancel(animation: Animator?) {}
-        override fun onAnimationStart(animation: Animator?) {}
-
-    })
-    objectAnimator.start()
 }

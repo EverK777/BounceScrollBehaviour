@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonScroll.setOnClickListener {
-           /* val intent = Intent(this,RecyclerViewExample::class.java)
-            startActivity(intent)*/
+            val intent = Intent(this,ScrollViewExample::class.java)
+            startActivity(intent)
         }
 
     }
