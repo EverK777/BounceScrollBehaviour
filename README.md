@@ -33,7 +33,7 @@ allprojects {
 
 ```
 dependencies {
-    implementation 'com.github.EverK777:BounceScrollBehaviour:1.0.1'
+    implementation 'com.github.EverK777:BounceScrollBehaviour:1.0.3'
 }
 ```
 
@@ -68,6 +68,11 @@ dependencies {
         </LinearLayout>
     </com.ever777.bouncingscroll.BouncingNestedScrollView>
  ```
+ 
+ ### You can disable the final animation
+  ```
+  bounceScroll.activateBounceAnim = false
+   ```
  
 # License
  
