@@ -1,7 +1,5 @@
 package com.ever777.bouncingscroll
 
-import android.animation.Animator
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -9,10 +7,8 @@ import android.graphics.Point
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import androidx.dynamicanimation.animation.DynamicAnimation
-import androidx.dynamicanimation.animation.SpringAnimation
-import androidx.dynamicanimation.animation.SpringForce
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.abs
 
 
 class BouncingRecyclerView @JvmOverloads constructor(
@@ -46,6 +42,9 @@ class BouncingRecyclerView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     private fun configureScroll() {
         this.setOnTouchListener { v, event ->
+
+
+            v.parent.requestDisallowInterceptTouchEvent(true)
 
             val rawY: Float
             val rawX: Float
@@ -126,30 +125,38 @@ class BouncingRecyclerView @JvmOverloads constructor(
                 isFreeScroll = true
             }
             if (event.action == MotionEvent.ACTION_UP) {
-
-                for (i in 0 until this.childCount) {
-                    val view: View = this.getChildAt(i)
-
-                    if (isOverScrolling && isOverScrollingVertical) {
-                        view.translationYAnimation(isFreeScroll,activateBounceAnim)
-                    } else if (isOverScrolling && !isOverScrollingVertical) {
-                        view.translationXAnimation(isFreeScroll,activateBounceAnim)
-                    }
-
+                val delta = oldYMove - rawY
+                if( abs(delta) < 25f){
+                    isFreeScroll = true
                 }
-                if (isOverScrolling) {
-                    isOverScrolling = false
-                    oldYMove = 0f
-                    oldXMove = 0f
-                }
-
-                currentYTranslation = 0f
-                currentXTranslation = 0f
-
-                isFreeScroll = false
+                returnAnim()
             }
             false
         }
+    }
+
+    private fun returnAnim(){
+
+        for (i in 0 until this.childCount) {
+            val view: View = this.getChildAt(i)
+
+            if (isOverScrolling && isOverScrollingVertical) {
+                view.translationYAnimation(isFreeScroll,activateBounceAnim)
+            } else if (isOverScrolling && !isOverScrollingVertical) {
+                view.translationXAnimation(isFreeScroll,activateBounceAnim)
+            }
+
+        }
+        if (isOverScrolling) {
+            isOverScrolling = false
+            oldYMove = 0f
+            oldXMove = 0f
+        }
+
+        currentYTranslation = 0f
+        currentXTranslation = 0f
+
+        isFreeScroll = false
     }
 
     override fun onChildAttachedToWindow(child: View) {

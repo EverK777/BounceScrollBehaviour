@@ -1,18 +1,16 @@
 package com.ever777.bouncingscroll
 
-import android.animation.Animator
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Point
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.widget.NestedScrollView
-import androidx.dynamicanimation.animation.DynamicAnimation
-import androidx.dynamicanimation.animation.SpringAnimation
-import androidx.dynamicanimation.animation.SpringForce
+import kotlin.math.abs
+
 
 class BouncingNestedScrollView @JvmOverloads constructor(
     context: Context,
@@ -93,10 +91,10 @@ class BouncingNestedScrollView @JvmOverloads constructor(
                     }
 
                 }
-                else {
-                    isOverScrollingVertical = true
+                else if(this.canScrollVertically(1) || this.canScrollVertically(-1)) {
                     val delta = oldYMove - rawY
                     if (!this.canScrollVertically(1)){
+                        isOverScrollingVertical = true
                         isOverScrolling = true
                         isFreeScroll =false
                         for (i in 0 until this.childCount) {
@@ -107,7 +105,9 @@ class BouncingNestedScrollView @JvmOverloads constructor(
                             }
                         }
                         return@setOnTouchListener false
-                    }else if(!this.canScrollVertically(-1)) {
+                    }
+                    if(!this.canScrollVertically(-1)) {
+                        isOverScrollingVertical = true
                         isOverScrolling = true
                         isFreeScroll =false
                         for (i in 0 until this.childCount) {
@@ -125,6 +125,10 @@ class BouncingNestedScrollView @JvmOverloads constructor(
                 isFreeScroll = true
             }
             if (event.action == MotionEvent.ACTION_UP) {
+                val delta = oldYMove - rawY
+                if( abs(delta) < 80f){
+                    isFreeScroll = true
+                }
 
                 for (i in 0 until this.childCount) {
                     val view: View = this.getChildAt(i)
@@ -150,4 +154,5 @@ class BouncingNestedScrollView @JvmOverloads constructor(
             false
         }
     }
+
 }
