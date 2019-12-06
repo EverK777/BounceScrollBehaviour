@@ -33,7 +33,7 @@ allprojects {
 
 ```
 dependencies {
-    implementation 'com.github.EverK777:BounceScrollBehaviour:1.0.4'
+    implementation 'com.github.EverK777:BounceScrollBehaviour:1.0.5'
 }
 ```
 
