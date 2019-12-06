@@ -78,7 +78,7 @@ class BouncingRecyclerView @JvmOverloads constructor(
                 mVelocityTracker?.addMovement(event)
                 mVelocityTracker?.computeCurrentVelocity(1000)
 
-                if (!isOverScrollingVertical) {
+                if (!isOverScrollingVertical || oppositeIsScrolling) {
                     if (!this.canScrollHorizontally(1)) {
                         if (deltaX > 0 && oldXMove != rawX) {
                             for (i in 0 until this.childCount) {
@@ -90,7 +90,7 @@ class BouncingRecyclerView @JvmOverloads constructor(
                             return@setOnTouchListener false
                         }
                     }
-                    if (!this.canScrollHorizontally(-1)) {
+                    if (!this.canScrollHorizontally(-1) || oppositeIsScrolling) {
                         if (deltaX < 0 && oldXMove != rawX) {
                             for (i in 0 until this.childCount) {
 

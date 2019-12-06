@@ -78,7 +78,7 @@ class BouncingNestedScrollView @JvmOverloads constructor(
                 mVelocityTracker?.computeCurrentVelocity(1000)
 
                 if (!isOverScrollingVertical) {
-                    if (!this.canScrollHorizontally(1)) {
+                    if (!this.canScrollHorizontally(1) || oppositeIsScrolling) {
                         if (deltaX > 0 && oldXMove != rawX) {
                             for (i in 0 until this.childCount) {
                                 val view: View = this.getChildAt(i)
@@ -89,7 +89,7 @@ class BouncingNestedScrollView @JvmOverloads constructor(
                             return@setOnTouchListener false
                         }
                     }
-                    if (!this.canScrollHorizontally(-1)) {
+                    if (!this.canScrollHorizontally(-1) || oppositeIsScrolling) {
                         if (deltaX < 0 && oldXMove != rawX) {
                             for (i in 0 until this.childCount) {
 
