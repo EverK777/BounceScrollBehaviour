@@ -4,12 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Point
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
 import androidx.core.widget.NestedScrollView
-import kotlin.math.abs
 
 
 class BouncingNestedScrollView @JvmOverloads constructor(
@@ -27,6 +26,8 @@ class BouncingNestedScrollView @JvmOverloads constructor(
     private var currentXTranslation = 0f
     private var currentYTranslation = 0f
     private var isFreeScroll = false
+    private var mVelocityTracker : VelocityTracker ? = null
+    private var oppositeIsScrolling = false
     var activateBounceAnim = true
 
     init {
@@ -38,11 +39,17 @@ class BouncingNestedScrollView @JvmOverloads constructor(
         configureScroll()
         this.overScrollMode = 2
 
+        if(this.canScrollHorizontally(1) || this.canScrollHorizontally(-1)){
+            isOverScrollingVertical = false
+        }
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun configureScroll() {
         this.setOnTouchListener { v, event ->
+
+            v.parent.requestDisallowInterceptTouchEvent(true)
 
             val rawY: Float
             val rawX: Float
@@ -54,91 +61,92 @@ class BouncingNestedScrollView @JvmOverloads constructor(
             if (!isOverScrolling) {
                 oldYMove = rawY
                 oldXMove = rawX
+                isOverScrolling = true
+
+                if (mVelocityTracker == null) {
+                    mVelocityTracker = VelocityTracker.obtain()
+                } else {
+                    mVelocityTracker?.clear()
+                }
             }
 
-            if (event.action == MotionEvent.ACTION_MOVE) {
-                if (this.canScrollHorizontally(1) || this.canScrollHorizontally(-1) ) {
-                    if (!this.canScrollHorizontally(1)) {
-                        isOverScrolling = true
-                        isOverScrollingVertical = false
-                        for (i in 0 until this.childCount) {
-                            val view: View = this.getChildAt(i)
-                            val delta = oldXMove - rawX
-                            if (delta > 0) {
-                                if (oldXMove != rawX) {
-                                    view.translationX = (delta * 0.50f) * -1
-                                    currentXTranslation = view.translationX
-                                }
-                            }
-                        }
-                        return@setOnTouchListener false
-                    }
-                    // horizontal scroll left to right
-                    if (!this.canScrollHorizontally(-1)) {
-                        isOverScrollingVertical = false
-                        isOverScrolling = true
-                        for (i in 0 until this.childCount) {
-                            val view: View = this.getChildAt(i)
-                            val delta = oldXMove - rawX
-                            if (delta < 0) {
-                                if (oldXMove != rawX) {
-                                    view.translationX = (delta * 0.50f) * -1
-                                    currentXTranslation = view.translationX
-                                }
-                            }
-                        }
-                        return@setOnTouchListener false
-                    }
+            val deltaY = oldYMove - rawY
+            val deltaX = oldXMove - rawX
 
-                }
-                else if(this.canScrollVertically(1) || this.canScrollVertically(-1)) {
-                    val delta = oldYMove - rawY
-                    if (!this.canScrollVertically(1)){
-                        isOverScrollingVertical = true
-                        isOverScrolling = true
-                        isFreeScroll =false
-                        for (i in 0 until this.childCount) {
-                            if(delta > 0 && oldXMove != rawY){
+            if (event.action == MotionEvent.ACTION_MOVE) {
+                mVelocityTracker?.addMovement(event)
+                mVelocityTracker?.computeCurrentVelocity(1000)
+
+                if (!isOverScrollingVertical) {
+                    if (!this.canScrollHorizontally(1)) {
+                        if (deltaX > 0 && oldXMove != rawX) {
+                            for (i in 0 until this.childCount) {
                                 val view: View = this.getChildAt(i)
-                                view.translationY = (delta * 0.50f) * -1
+                                view.translationX = (deltaX * 0.50f) * -1
+                                currentXTranslation = view.translationX
+                            }
+                            oppositeIsScrolling = true
+                            return@setOnTouchListener false
+                        }
+                    }
+                    if (!this.canScrollHorizontally(-1)) {
+                        if (deltaX < 0 && oldXMove != rawX) {
+                            for (i in 0 until this.childCount) {
+
+                                val view: View = this.getChildAt(i)
+                                view.translationX = (deltaX * 0.50f) * -1
+                                currentXTranslation = view.translationX
+                            }
+                            oppositeIsScrolling = true
+                            return@setOnTouchListener false
+                        }
+
+                    }
+                }
+
+                // vertical scroll
+                else {
+                    if (!this.canScrollVertically(-1) || oppositeIsScrolling) {
+                        isOverScrolling = true
+                        if (deltaY < 0 && deltaY != rawY) {
+                            for (i in 0 until this.childCount) {
+                                val view: View = this.getChildAt(i)
+                                view.translationY = (deltaY * 0.50f) * -1
                                 currentYTranslation = view.translationY
                             }
+                            oppositeIsScrolling = true
+                            return@setOnTouchListener false
                         }
-                        return@setOnTouchListener false
                     }
-                    if(!this.canScrollVertically(-1)) {
-                        isOverScrollingVertical = true
+                    if (!this.canScrollVertically(1) || oppositeIsScrolling) {
                         isOverScrolling = true
-                        isFreeScroll =false
-                        for (i in 0 until this.childCount) {
-                            if(delta < 0 && oldXMove != rawY) {
+                        if (rawY != oldYMove && deltaY > 0) {
+                            for (i in 0 until this.childCount) {
                                 val view: View = this.getChildAt(i)
-                                view.translationY = (delta * 0.50f) * -1
+                                view.translationY = (deltaY * 0.50f) * -1
                                 currentYTranslation = view.translationY
                             }
+                            oppositeIsScrolling = true
+                            return@setOnTouchListener false
                         }
-                        return@setOnTouchListener false
                     }
                 }
+
                 oldYMove = rawY
                 oldXMove = rawX
                 isFreeScroll = true
             }
             if (event.action == MotionEvent.ACTION_UP) {
-                val delta = oldYMove - rawY
-                if( abs(delta) < 80f){
-                    isFreeScroll = true
-                }
+
 
                 for (i in 0 until this.childCount) {
                     val view: View = this.getChildAt(i)
 
                     if (isOverScrolling && isOverScrollingVertical) {
-                        view.translationYAnimation(isFreeScroll,activateBounceAnim)
+                        view.translationYAnimation(isFreeScroll,activateBounceAnim,mVelocityTracker)
                     } else if (isOverScrolling && !isOverScrollingVertical) {
-                        view.translationXAnimation(isFreeScroll,activateBounceAnim)
+                        view.translationXAnimation(isFreeScroll, activateBounceAnim,mVelocityTracker)
                     }
-
                 }
                 if (isOverScrolling) {
                     isOverScrolling = false
@@ -148,7 +156,7 @@ class BouncingNestedScrollView @JvmOverloads constructor(
 
                 currentYTranslation = 0f
                 currentXTranslation = 0f
-
+                oppositeIsScrolling = false
                 isFreeScroll = false
             }
             false
