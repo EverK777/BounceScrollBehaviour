@@ -56,8 +56,8 @@ interface BounceBehaiviour {
         if(velocityTracker !=null){
             springAnimationY.setMaxValue(200f)
             var velocity = velocityTracker.xVelocity
-            if(kotlin.math.abs(velocity) > 250f){
-                velocity = 250f
+            if(kotlin.math.abs(velocity) > 300f){
+                velocity = 300f
             }
             springAnimationY.setStartVelocity(velocity)
             springAnimationY.spring?.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
@@ -75,8 +75,8 @@ interface BounceBehaiviour {
         if(velocityTracker !=null){
             springAnimationX.setMaxValue(200f)
             var velocitx = velocityTracker.xVelocity
-            if(kotlin.math.abs(velocitx) > 250f){
-                velocitx = 250f
+            if(kotlin.math.abs(velocitx) > 300f){
+                velocitx = 300f
             }
             springAnimationX.setStartVelocity(velocitx)
             springAnimationX.spring?.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
