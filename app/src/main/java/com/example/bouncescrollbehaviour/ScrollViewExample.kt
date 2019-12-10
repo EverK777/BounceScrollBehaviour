@@ -28,8 +28,6 @@ class ScrollViewExample : AppCompatActivity() {
         scrollRV.adapter = adapter
 
 
-
-
     }
 
     private fun setData() {
