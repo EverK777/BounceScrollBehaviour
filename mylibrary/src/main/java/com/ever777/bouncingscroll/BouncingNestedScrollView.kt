@@ -28,7 +28,7 @@ class BouncingNestedScrollView @JvmOverloads constructor(
     private var isFreeScroll = false
     private var mVelocityTracker : VelocityTracker ? = null
     private var oppositeIsScrolling = false
-    var activateBounceAnim = true
+    var activateBounceAnim = false
 
     init {
         val display = (getContext() as Activity).windowManager.defaultDisplay

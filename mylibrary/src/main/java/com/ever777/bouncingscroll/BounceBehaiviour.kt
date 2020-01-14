@@ -4,6 +4,10 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.view.VelocityTracker
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
@@ -14,7 +18,8 @@ interface BounceBehaiviour {
     //  animation when the user makes an a over horizontal scroll
      fun View.translationXAnimation(isFreeScroll : Boolean, activateBounceAnim : Boolean, velocityTracker: VelocityTracker?) {
         val objectAnimator = ObjectAnimator.ofFloat(this, View.TRANSLATION_X, this.translationX, 0f)
-        objectAnimator.duration = 180
+        objectAnimator.duration = 350
+        objectAnimator.interpolator = DecelerateInterpolator()
         objectAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
@@ -32,7 +37,8 @@ interface BounceBehaiviour {
     //  animation when the user makes an a over vertical scroll
      fun View.translationYAnimation(isFreeScroll : Boolean, activateBounceAnim : Boolean, velocityTracker: VelocityTracker?) {
         val objectAnimator = ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, this.translationY, 0f)
-        objectAnimator.duration = 180
+        objectAnimator.duration = 350
+        objectAnimator.interpolator = DecelerateInterpolator()
         objectAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {

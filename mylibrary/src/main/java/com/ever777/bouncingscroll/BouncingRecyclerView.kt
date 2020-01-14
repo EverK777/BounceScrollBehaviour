@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 
@@ -28,7 +29,7 @@ class BouncingRecyclerView @JvmOverloads constructor(
     private var isFreeScroll = false
     private var oppositeIsScrolling = false
     private var  mVelocityTracker : VelocityTracker?= null
-    var activateBounceAnim = true
+    var activateBounceAnim = false
 
     init {
         val display = (getContext() as Activity).windowManager.defaultDisplay
@@ -138,8 +139,6 @@ class BouncingRecyclerView @JvmOverloads constructor(
                 isFreeScroll = true
             }
             if (event.action == MotionEvent.ACTION_UP) {
-
-
                 for (i in 0 until this.childCount) {
                     val view: View = this.getChildAt(i)
 
